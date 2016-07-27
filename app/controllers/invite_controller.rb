@@ -108,15 +108,15 @@ class InviteController < ApplicationController
     end
 
     def apple_id
-      Rails.logger.error "No app to add this tester to provided, use the `ITC_APP_ID` environment variable" unless ENV["ITC_APP_ID"]
+      Rails.logger.error "No app to add this tester to provided, use the `ITC_APP_ID` environment variable" unless params[:appID]
 
       Rails.cache.fetch('AppID', expires_in: 10.minutes) do
-        if ENV["ITC_APP_ID"].include?"." # app identifier
+        if params[:appID].include?"." # app identifier
           login
-          app = Spaceship::Application.find(ENV["ITC_APP_ID"])
+          app = Spaceship::Application.find(params[:appID])
           app.apple_id
         else
-          ENV["ITC_APP_ID"].to_s
+          params[:appID].to_s
         end
       end
     end
@@ -124,7 +124,7 @@ class InviteController < ApplicationController
     def app
       login
 
-      @app ||= Spaceship::Tunes::Application.find(ENV["ITC_APP_ID"])
+      @app ||= Spaceship::Tunes::Application.find(params[:appID])
 
       raise "Could not find app with ID #{apple_id}" unless @app
 
